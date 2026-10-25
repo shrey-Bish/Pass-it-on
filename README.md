@@ -5,7 +5,11 @@ Each item gets its own agent: it plans its route through the day around everyone
 in character, and confirms every handoff with a one-time QR code.
 
 Cubbie Hackathon, Track 2 (Agent-to-Agent Coordination). Built by **Enrollment Goblins**: Shrey Bishnoi and Sumanth
-Akella. Work in progress: the judge-facing README, site and video come next.
+Akella.
+
+<a href="https://drive.google.com/file/d/1udpUBQXdrY9GO4o798WYyoYqQGYMYvMZ/view"><img src="docs/img/video-poster.jpg" width="270" alt="Watch the 1-minute video"></a>
+
+▶ **[Watch the 1-minute video](https://drive.google.com/file/d/1udpUBQXdrY9GO4o798WYyoYqQGYMYvMZ/view)** (Google Drive)
 
 ## What works today
 
