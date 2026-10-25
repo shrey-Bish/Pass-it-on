@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Found one · Pass It On{% endblock %}
+{% block main_style %}style="gap: 24px;"{% endblock %}
+{% block content %}
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">{{ 'Asked the owner' if status == 'waiting_owner' else 'Found one' }}</h1>
+  <p class="lede">{{ for_line }}</p>
+</header>
+
+<article class="card action" style="gap: 16px;">
+  <div class="row" style="align-items: flex-start; gap: 14px;">
+    {% if photo %}<img class="thumb" src="{{ photo }}" alt="">{% else %}<span class="thumb thumb--empty">{{ ui.icon('box', 'icon--lg') }}</span>{% endif %}
+    <div class="item__body"><p class="item__name">{{ owner }}'s {{ item.type }}</p>{{ ui.pill(status) }}</div>
+  </div>
+  {% if stops %}<ol class="timeline">{% for s in stops %}{{ ui.stop(s) }}{% endfor %}</ol>{% endif %}
+  {% if status == 'waiting_owner' %}
+    <p class="action__text">I asked {{ owner }}. I'll text you when they answer.</p>
+  {% elif unconfirmed %}
+    <form class="actions" method="post" action="{{ link('/borrow/' ~ req.id ~ '/confirm') }}"><button class="btn btn--primary btn--lg">Confirm</button></form>
+  {% else %}
+    <p class="done-line" role="status">{{ ui.icon('check') }}Confirmed. I'll text you before each handoff.</p>
+  {% endif %}
+  {% if req.status not in ('active', 'done') %}
+  <form method="post" action="{{ link('/requests/' ~ req.id ~ '/cancel') }}"><button class="btn btn--quiet btn--block">Not this one</button></form>
+  {% endif %}
+</article>
+
+<div class="notes">
+  {{ ui.note('lock', owner ~ ' only sees your first name, the time and the building.') }}
+  {{ ui.note('info', 'Check your exam allows that calculator model.') }}
+</div>
+{% endblock %}

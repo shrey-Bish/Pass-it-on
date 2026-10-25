@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}On the waiting list · Pass It On{% endblock %}
+{% block main_style %}style="gap: 24px;"{% endblock %}
+{% block content %}
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">On the waiting list</h1>
+  <p class="lede">Nobody has one free for {{ req.window_start.strftime('%a') }} {{ clock(req.window_start) }} yet.</p>
+</header>
+
+<article class="card stack" style="gap: 16px;">
+  <div class="row" style="align-items: flex-start; gap: 14px;">
+    <span class="thumb thumb--empty">{{ ui.icon('search', 'icon--lg') }}</span>
+    <div class="item__body"><p class="item__name">{{ req.item_type[:1] | upper }}{{ req.item_type[1:] }}</p><p class="item__line">{{ line }}</p>{{ ui.pill('waiting_list') }}</div>
+  </div>
+  <p class="note" style="color: #1d1c19;">{{ ui.icon('texts') }}I'll text you the moment one opens up.</p>
+</article>
+
+<div class="stack" style="gap: 8px;">
+  <a class="btn btn--primary btn--lg btn--block" href="{{ link('/') }}">Back to Home</a>
+  <form method="post" action="{{ link('/requests/' ~ req.id ~ '/cancel') }}"><button class="btn btn--quiet btn--warn btn--block">Leave the waiting list</button></form>
+</div>
+
+{{ ui.note('lock', 'Only the time and building are shared, never why.') }}
+{% endblock %}

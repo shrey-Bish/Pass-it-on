@@ -1,20 +1,47 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Pass It On{% endblock %}
+{% block main_style %}style="padding-top: 24px;"{% endblock %}
 {% block content %}
-<section class="hero">
-  <h1>Your stuff has an agent now.</h1>
-  <p class="lede">Lend your calculator, goggles or blazer to classmates. It plans its own route around everyone's exams, and texts whoever has it.</p>
-</section>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-{% if sent %}
-  <p class="note">Check your texts for a sign-in link.</p>
-  {% if dev_link %}<p class="small">No texting set up yet, so here's your link: <a href="{{ dev_link }}">sign in</a></p>{% endif %}
+{{ ui.brand() }}
+
+<header class="head" style="gap: 12px;">
+  <h1 class="display">Your stuff has an agent now.</h1>
+  <p class="lede">Lend your calculator, goggles or blazer to classmates. It plans its own day around everyone's exams, texts whoever has it, and comes home on time.</p>
+</header>
+
+<div class="card stack">
+  <div class="msg" style="max-width: 100%;">
+    <img class="msg__face" src="/static/sample-ti84.jpg" alt="">
+    <p class="bubble" style="background: #f6f4ef; box-shadow: none;">Hi! I'm Maya's calculator 🧮 Meet Jay at Coor Hall at 11:45. Big day for us!</p>
+  </div>
+  <p class="note" style="padding-left: 40px;">{{ ui.icon('clock') }}Today: 11:45 Jay, 1:20 Priya, home by 5</p>
+</div>
+
+{% if forgotten %}<p class="toast" role="status">{{ ui.icon('check') }}Done. Everything about you is deleted.</p>{% endif %}
+{% if expired %}
+<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">That link expired</p><p class="alert__text">Links work once, for 15 minutes. Ask for a new one below.</p></div></div>
 {% endif %}
-{% if request.query_params.get('expired') %}<p class="error">That link expired. Ask for a new one.</p>{% endif %}
-{% if request.query_params.get('forgotten') %}<p class="note">Done. Everything about you is deleted.</p>{% endif %}
-<form class="card stack" method="post" action="/login">
-  <label>Your phone number<input type="tel" name="phone" placeholder="480 555 1234" autocomplete="tel" required></label>
+{% if error %}
+<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">Check that number</p><p class="alert__text">{{ error }}</p></div></div>
+{% endif %}
+
+{% if sent %}
+<div class="card stack" role="status">
+  <p class="item__name">Check your texts</p>
+  <p class="item__line">Tap the link I sent to sign in.</p>
+  {% if dev_link %}<p class="note wrap-anywhere">{{ ui.icon('info') }}<span>No texting set up yet, so here's the link: <a href="{{ dev_link }}">sign in</a></span></p>{% endif %}
+</div>
+{% else %}
+<form class="stack" method="post" action="/login" style="margin-top: auto;">
+  <div class="field">
+    <label class="label" for="phone">Your phone number</label>
+    <div class="input-group"><span class="input-group__addon">+1</span><input class="input" id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(480) 555-0123" required></div>
+  </div>
   <input type="hidden" name="next" value="{{ next or '' }}">
-  <button class="btn primary wide">Text me a sign-in link</button>
+  <button class="btn btn--primary btn--lg btn--block">Text me a sign-in link</button>
+  <a class="btn btn--secondary btn--block" href="/demo">Try the demo</a>
+  {{ ui.note('lock', 'Classmates only see your first name.', 'center') }}
 </form>
-<a class="btn wide" href="/demo">Try the demo</a>
+{% endif %}
 {% endblock %}

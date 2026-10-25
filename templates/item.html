@@ -1,26 +1,51 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ item.type }} · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/', 'Home') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 24px;"{% endblock %}
 {% block content %}
-<h1>{{ item.type }}</h1>
-{% if item.photo %}<div class="photo"><img src="{{ link('/photos/' ~ item.photo) }}" alt="{{ item.type }}"></div>{% endif %}
-<dl class="facts">
-  <dt>With</dt><dd>{{ holder }}</dd>
-  <dt>Marks</dt><dd>{{ item.fingerprint or 'none noted' }}</dd>
-  <dt>Home by</dt><dd>{{ item.rules.return_by }} at {{ campus.name(item.rules.home_building) }}</dd>
-  {% if mine %}<dt>This week</dt><dd>{{ served }} exam{{ '' if served == 1 else 's' }}</dd>{% endif %}
-</dl>
+{% if photo %}<div class="photo" style="view-transition-name: photo-{{ item.id }}"><img src="{{ photo }}" alt="{{ item.type }}"></div>{% endif %}
+
+<header class="head" style="gap: 8px;">
+  <div class="row row--between" style="align-items: flex-start;"><h1 class="title">{{ item.type }}</h1><span style="margin-top: 4px;">{{ ui.pill(status) }}</span></div>
+  <p class="lede">{{ home_line }}{% if not mine %} · {{ owner }}'s{% endif %}</p>
+</header>
+
+{% if holder %}
+<div class="card row">
+  <span class="avatar">{{ holder.initial }}</span>
+  <div class="grow"><p class="item__name">With {{ holder.name }} now</p><p class="item__line">{{ holder.line }}</p></div>
+</div>
+{% endif %}
+
 {% if mine %}
-<section>
-  <h2>Its route</h2>
-  <div class="card timeline">
-  {% for l in legs %}
-    <div class="stop"><span class="time {{ 'done' if l.status == 'done' }}">{{ clock(l.pickup_time) }}</span>
-      <span class="{{ 'done' if l.status == 'done' }}">{{ names[l.giver_id] }} → {{ names[l.holder_id] }} · {{ campus.name(l.pickup_building) }}</span></div>
-  {% else %}<p class="empty">No one's borrowing it yet.</p>{% endfor %}
-  </div>
+<section class="section" aria-labelledby="route-h">
+  <div class="section__head"><h2 class="section__title" id="route-h">Today's route</h2><span class="hint">{{ today }}</span></div>
+  {% if stops %}
+  <div class="card"><ol class="timeline">{% for s in stops %}{{ ui.stop(s) }}{% endfor %}</ol></div>
+  {% else %}
+  <div class="card row"><span class="empty__icon">{{ ui.icon('check') }}</span><div class="grow"><p class="item__name">Home, resting</p><p class="item__line">I'll text you when someone asks.</p></div></div>
+  {% endif %}
+  {{ ui.note('lock', 'Only the time and building are shared, never why.') }}
 </section>
-<div class="row">
-  <a class="btn" href="{{ link('/items/' ~ item.id ~ '/edit') }}">Edit</a>
-  <form class="inline" method="post" action="{{ link('/moveout') }}"><button class="btn">I'm moving out</button></form>
+
+<div class="card row">
+  <span class="empty__icon" style="background: #efebe2; color: #1d1c19;">{{ ui.icon('calendar') }}</span>
+  <div class="grow"><p class="item__name">This week: {% if served %}{{ served }} exam{{ '' if served == 1 else 's' }}{% else %}no exams yet{% endif %}</p><p class="item__line">{% if served %}{{ served }} {{ 'person' if served == 1 else 'people' }} didn't have to buy one.{% else %}{{ home_line }}, every day.{% endif %}</p></div>
+</div>
+{% endif %}
+
+{% if marks %}
+<div class="card stack" style="gap: 10px;">
+  <p class="item__name">How to spot it</p>
+  {% for m in marks %}<p class="drow__mark"><span class="mark-key" aria-hidden="true">{{ loop.index }}</span>{{ m }}</p>{% endfor %}
+</div>
+{% endif %}
+
+{% if mine %}
+<div class="actions" style="margin-top: 0;">
+  <a class="btn btn--secondary" href="{{ link('/items/' ~ item.id ~ '/edit') }}">{{ ui.icon('edit') }}Edit</a>
+  {% if item.mode == 'lend' %}<form method="post" action="{{ link('/moveout') }}"><button class="btn btn--secondary btn--warn">{{ ui.icon('box') }}I'm moving out</button></form>{% endif %}
 </div>
 {% endif %}
 {% endblock %}

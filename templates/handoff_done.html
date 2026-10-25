@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}It's with you · Pass It On{% endblock %}
+{% block main_style %}style="padding-top: 56px; gap: 28px;"{% endblock %}
+{% block content %}
+<div class="hop" aria-hidden="true">
+  <span class="hop__who"><span class="avatar">{{ other.name[:1] }}</span>{{ other.name }}</span>
+  <span class="hop__track">{% if photo %}<img class="hop__item" src="{{ photo }}" alt="">{% endif %}</span>
+  <span class="hop__who"><span class="avatar avatar--you">{{ me_initial }}</span>You</span>
+</div>
+
+<div class="result after-hop" role="status">
+  <h1 class="result__title">It's with you</h1>
+  <p class="result__text">{{ owner[:1] | upper }}{{ owner[1:] }}. {{ after }}</p>
+</div>
+
+{#- Optional check-in photo: picking one sends it straight away. -#}
+<form method="post" action="{{ link('/legs/' ~ leg.id ~ '/photo') }}" enctype="multipart/form-data" class="after-hop">
+  <label class="card list__row file" style="padding: 12px 12px 12px 16px;">
+    <input type="file" name="photo" accept="image/*" capture="environment" onchange="this.form.submit()" aria-label="Snap a check-in photo">
+    <span class="empty__icon">{{ ui.icon('camera') }}</span>
+    <span class="item__body"><span class="item__name">Snap a check-in photo</span><span class="item__line">Optional. It helps if something's off later.</span></span>
+    {{ ui.icon('chevron') }}
+  </label>
+</form>
+
+<a class="btn btn--primary btn--lg btn--block" href="{{ link('/') }}" style="margin-top: auto;">Done</a>
+{% endblock %}

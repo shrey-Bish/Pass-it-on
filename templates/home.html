@@ -1,79 +1,79 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Home · Pass It On{% endblock %}
 {% block content %}
-{% if approvals or parts or moveout_offers or offers %}
-<section>
-  <h2>Waiting on you</h2>
-  <div class="stack">
-  {% for a in approvals %}
-    <div class="card action">
-      <p class="title">{{ a.who.name }} wants your {{ a.item.type }}</p>
-      <p class="meta"><b>{{ day(a.req.window_start) }}, {{ clock(a.req.window_start) }}–{{ clock(a.req.window_end) }}</b> · {{ campus.name(a.req.building) }}</p>
-      <div class="row">
-        <form class="inline" method="post" action="{{ link('/requests/' ~ a.req.id ~ '/answer') }}"><input type="hidden" name="yes" value="1"><button class="btn primary">Yes</button></form>
-        <form class="inline" method="post" action="{{ link('/requests/' ~ a.req.id ~ '/answer') }}"><button class="btn">No</button></form>
-      </div>
-    </div>
-  {% endfor %}
-  {% for i in moveout_offers %}
-    <div class="card action">
-      <p class="title">Want to keep this {{ i.type }}?</p>
-      <p class="small">Its owner is moving out. If you say yes, it's yours.</p>
-      <div class="row">
-        <form class="inline" method="post" action="{{ link('/moveout/' ~ i.id ~ '/answer') }}"><input type="hidden" name="yes" value="1"><button class="btn primary">Yes, it's mine</button></form>
-        <form class="inline" method="post" action="{{ link('/moveout/' ~ i.id ~ '/answer') }}"><button class="btn">No thanks</button></form>
-      </div>
-    </div>
-  {% endfor %}
-  {% for p in parts %}
-    <div class="card {{ 'action' if not p.confirmed or p.soon }}">
-      <p class="title">{{ p.what }}</p>
-      <p class="meta"><b>{{ clock(p.leg.pickup_time) }}</b> · {{ campus.name(p.leg.pickup_building) }} · {{ day(p.leg.pickup_time) }}</p>
-      <div class="row">
-        {% if p.active %}<span class="pill ok">With {{ 'you' if p.receiving else p.other.name }}</span>
-        {% elif p.confirmed %}<span class="pill ok">Confirmed</span>
-        {% else %}<form class="inline" method="post" action="{{ link('/legs/' ~ p.leg.id ~ '/confirm') }}"><button class="btn primary">Confirm</button></form>{% endif %}
-        {% if not p.active %}<a class="btn" href="{{ link('/legs/' ~ p.leg.id) }}">{{ 'Hand it over' if not p.receiving else 'I got it' }}</a>{% endif %}
-      </div>
-    </div>
-  {% endfor %}
-  {% for e in offers %}
-    <div class="card">
-      <p class="title">{{ e.course }} exam {{ day(e.start) }}</p>
-      <p class="small">You have an exam and no calculator listed. Want me to find one?</p>
-      <form method="post" action="{{ link('/borrow/exam/' ~ e.uid) }}"><button class="btn primary">Find one</button></form>
-    </div>
-  {% endfor %}
+<header class="head" style="padding-top: 12px;">
+  <p class="eyebrow">{{ today }}</p>
+  <h1 class="title">{{ hello }}{% if me.name %}, {{ me.name }}{% endif %}</h1>
+</header>
+
+<section class="section" aria-labelledby="wait-h">
+  <div class="section__head">
+    <h2 class="section__title" id="wait-h">Waiting on you</h2>
+    {% if waiting %}<span class="count" aria-label="{{ waiting | length }} things">{{ waiting | length }}</span>{% endif %}
   </div>
-</section>
-{% endif %}
-<section>
-  <h2>Your stuff</h2>
-  <div class="stack">
-  {% for i in items %}
-    <a class="card" href="{{ link('/items/' ~ i.id) }}" style="text-decoration:none">
-      <p class="title">{{ i.type }}</p>
-      <p class="meta">{% if not i.listed %}<span class="pill wait">Not listed yet</span>{% elif i.mode == 'give_away' %}<span class="pill wait">Finding a new home</span>{% else %}<span class="pill ok">Lending</span>{% endif %}</p>
-    </a>
+  {% for c in waiting %}
+    {% if c.kind == "handoff" %}{{ ui.handoff_card(c) }}
+    {% elif c.kind == "ask" %}{{ ui.ask_card(c) }}
+    {% else %}
+      <article class="card action">
+        <h3 class="action__title">{{ c.title }}</h3>
+        <p class="action__text">{{ c.text }}</p>
+        <form class="actions" method="post" action="{{ c.url }}"><button class="btn btn--primary">Find one</button></form>
+      </article>
+    {% endif %}
   {% else %}
-    <p class="empty">Nothing listed yet. <a href="{{ link('/list') }}">Lend something</a></p>
+    <div class="row" style="padding: 4px 0;">
+      <span class="empty__icon">{{ ui.icon("check") }}</span>
+      <div class="grow"><p class="item__name">Nothing needs you right now</p><p class="item__line">Handoffs and requests show up here.</p></div>
+    </div>
   {% endfor %}
-  </div>
 </section>
-<section>
-  <h2>Borrowing</h2>
-  <div class="stack">
-  {% for r in requests %}
-    <div class="card">
-      <p class="title">{{ r.item_type }}</p>
-      <p class="meta"><b>{{ day(r.window_start) }}, {{ clock(r.window_start) }}</b> · {{ campus.name(r.building) }}</p>
-      <p class="meta"><span class="pill {{ 'ok' if r.status in ('planned','confirmed','active','done') else 'wait' }}">{{ status_words[r.status] }}</span></p>
+
+<section class="section" aria-labelledby="stuff-h">
+  <div class="section__head">
+    <h2 class="section__title" id="stuff-h">Your stuff</h2>
+    {% if stuff %}<a class="btn btn--quiet btn--link" href="{{ link('/list') }}">Add</a>{% endif %}
+  </div>
+  {% if stuff %}
+    <div class="card card--flush list">
+      {% for it in stuff %}{{ ui.item_row(it, morph=true) }}{% endfor %}
     </div>
   {% else %}
-    <p class="empty">Need something? <a href="{{ link('/borrow') }}">Borrow it</a></p>
-  {% endfor %}
-  </div>
+    <div class="card card--quiet empty">
+      <p class="empty__title">Lend something you're not using today</p>
+      <p class="empty__text">Snap a photo. I'll plan its day and bring it home on time.</p>
+      <a class="btn btn--primary btn--block" href="{{ link('/list') }}">{{ ui.icon("camera") }}Take a photo</a>
+    </div>
+  {% endif %}
 </section>
+
+<section class="section" aria-labelledby="borrow-h">
+  <h2 class="section__title" id="borrow-h">Borrowing</h2>
+  {% if borrowing %}
+    <div class="card card--flush list">
+      {% for it in borrowing %}{{ ui.item_row(it) }}{% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty">
+      <p class="empty__title">Exam coming up?</p>
+      <p class="empty__text">Tell me what you need. I'll find a classmate's.</p>
+      <a class="btn btn--secondary btn--block" href="{{ link('/borrow') }}">Find one</a>
+    </div>
+  {% endif %}
+  {% if not has_calendar %}
+  <a class="card list__row" href="{{ link('/calendar') }}" style="padding: 12px 12px 12px 16px;">
+    <span class="empty__icon" style="background: #efebe2; color: #1d1c19;">{{ ui.icon('calendar') }}</span>
+    <span class="item__body"><span class="item__name">Add your exam calendar</span><span class="item__line">So your stuff stays with you during exams</span></span>
+    {{ ui.icon('chevron') }}
+  </a>
+  {% endif %}
+</section>
+
 {% if not demo %}
-<form method="post" action="/forget" class="small"><button class="btn">Delete everything about me</button></form>
+<div class="row" style="justify-content: center; flex-wrap: wrap; gap: 4px;">
+  <form method="post" action="/logout"><button class="btn btn--quiet">Sign out</button></form>
+  <form method="post" action="/forget"><button class="btn btn--quiet btn--warn">Delete everything about me</button></form>
+</div>
 {% endif %}
 {% endblock %}

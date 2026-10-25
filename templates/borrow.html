@@ -1,18 +1,36 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Borrow · Pass It On{% endblock %}
+{% block main_style %}style="gap: 24px;"{% endblock %}
 {% block content %}
-<h1>Borrow something</h1>
-<p class="lede">Say what you need, when and where. Only the time and building are shared, never why.</p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form class="card stack" method="post" action="{{ link('/borrow') }}">
-  <textarea name="text" placeholder="need a TI-84 for my stats exam Thu 2pm in Durham Hall" required>{{ text or '' }}</textarea>
-  <button class="btn primary wide">Find one</button>
-  <p class="small">Check your exam allows that calculator model.</p>
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">Borrow</h1>
+  <p class="lede">Tell me what you need and when.</p>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">Almost</p><p class="alert__text">{{ error }}</p></div></div>{% endif %}
+
+<form class="stack" method="post" action="{{ link('/borrow') }}" style="gap: 12px;">
+  <label class="sr-only" for="need">What do you need?</label>
+  <textarea class="textarea" id="need" name="text" rows="4" placeholder="need a TI-84 for my stats exam Thu 2pm in Durham Hall" required>{{ text or '' }}</textarea>
+  <button class="btn btn--primary btn--lg btn--block">{{ ui.icon('search') }}Find one</button>
 </form>
-{% for e in offers %}
-<div class="card">
-  <p class="title">{{ e.course }} exam {{ day(e.start) }}, {{ clock(e.start) }}</p>
-  <p class="small">No calculator listed. Want me to find one?</p>
-  <form method="post" action="{{ link('/borrow/exam/' ~ e.uid) }}"><button class="btn primary">Find one</button></form>
+
+<div class="notes">
+  {{ ui.note('lock', 'Only the time and building are shared, never why.') }}
+  {{ ui.note('info', 'Check your exam allows that calculator model.') }}
 </div>
-{% endfor %}
+
+{% if offers %}
+<section class="section" aria-labelledby="cal-h">
+  <h2 class="section__title" id="cal-h">From your calendar</h2>
+  {% for c in offers %}
+  <article class="card action">
+    <h3 class="action__title">{{ c.title }}</h3>
+    <p class="action__text">{{ c.text }}</p>
+    <form class="actions" method="post" action="{{ c.url }}"><button class="btn btn--primary">Find one</button></form>
+  </article>
+  {% endfor %}
+</section>
+{% endif %}
 {% endblock %}

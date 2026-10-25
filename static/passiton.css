@@ -1,0 +1,28 @@
+/* Small additions to pass-it-on.css (the Claude Design file, kept unchanged) for things only the live app needs. */
+
+/* "Change" rows: tap Change to open an input in place. Inputs in a closed <details> still submit. */
+.rows > * + * { border-top: 1px solid var(--line); }
+.rows > .drow + .drow { border-top: 1px solid var(--line); }
+details.edit > summary { list-style: none; cursor: pointer; }
+details.edit > summary::-webkit-details-marker { display: none; }
+details.edit > summary .btn { pointer-events: none; }
+details.edit[open] > summary .btn { visibility: hidden; }
+.edit__body { padding: 0 var(--s4) var(--s4); }
+.edit__body .seg { margin-top: 0; }
+
+/* The demo page puts the real app in each phone. */
+.phone__screen iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
+
+/* A quiet row of sample calendars for testing. */
+.samples { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); font-size: var(--t-meta); color: var(--muted); }
+.samples .btn { min-height: 40px; }
+
+/* Times like "11:45 AM" stay on one line in the route timeline. */
+.stop { grid-template-columns: 82px 20px minmax(0, 1fr); }
+.stop__time { white-space: nowrap; }
+
+/* Centred quiet notes (the design centres a few under buttons). */
+.note.center { justify-content: center; text-align: left; }
+
+/* Long dev-only sign-in links wrap instead of widening the page. */
+.wrap-anywhere { overflow-wrap: anywhere; }

@@ -1,11 +1,33 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Lend · Pass It On{% endblock %}
+{% block main_style %}style="gap: 20px;"{% endblock %}
 {% block content %}
-<h1>Lend something</h1>
-<p class="lede">Take a photo. I'll work out what it is and note its marks, like a sticker or a scratch, so handoffs can be checked later.</p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form class="card stack" method="post" action="{{ link('/list') }}" enctype="multipart/form-data">
-  <input type="file" name="photo" accept="image/*" capture="environment" required>
-  <button class="btn primary wide">Look at my photo</button>
-  <p class="small">Calculators, goggles, blazers, cameras, tools. Never notes, keys, IDs or medicine.</p>
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">Lend something</h1>
+  <p class="lede">Snap it on a plain surface. I'll fill in the rest.</p>
+</header>
+
+<p class="crumbs"><b>Photo</b>{{ ui.icon('chevron', 'icon--sm') }}Is this right?{{ ui.icon('chevron', 'icon--sm') }}Listed</p>
+
+{% if error %}
+<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">Let's try that again</p><p class="alert__text">{{ error }}</p></div></div>
+{% endif %}
+
+{#- "Take a photo" is a label wrapping a file input; picking a photo sends it straight away. -#}
+<form method="post" action="{{ link('/list') }}" enctype="multipart/form-data" class="stack" style="gap: 20px;">
+  <label class="tile file">
+    <input type="file" name="photo" accept="image/*" capture="environment" onchange="this.form.submit()" aria-label="Take a photo">
+    <span class="tile__icon">{{ ui.icon('camera', 'icon--xl') }}</span>
+    <span class="empty__title">Take a photo</span>
+    <span class="empty__text" style="max-width: 26ch;">Show any stickers or scratches. They help people spot it.</span>
+  </label>
+  <div class="stack" style="gap: 8px;">
+    <label class="btn btn--primary btn--lg btn--block file"><input type="file" name="camera" accept="image/*" capture="environment" onchange="this.form.submit()" aria-label="Take a photo">{{ ui.icon('camera') }}Take a photo</label>
+    <label class="btn btn--quiet btn--block file"><input type="file" name="library" accept="image/*" onchange="this.form.submit()" aria-label="Choose from your photos">Choose from your photos</label>
+    <noscript><button class="btn btn--secondary btn--block">Send photo</button></noscript>
+  </div>
 </form>
+
+{{ ui.note('lock', 'Calculators, goggles, blazers, cameras, tools. Never notes, keys, IDs or medicine.') }}
 {% endblock %}

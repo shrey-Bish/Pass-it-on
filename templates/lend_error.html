@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Couldn't read the photo · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/list', 'Cancel') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 20px;"{% endblock %}
+{% block content %}
+<div class="photo photo--dim"><img src="{{ photo }}" alt="Your photo"></div>
+
+<div class="alert" role="alert">
+  {{ ui.icon('alert') }}
+  <div>
+    <p class="alert__title">{{ "That can't be lent here" if refused else "I couldn't make it out" }}</p>
+    <p class="alert__text">{{ error }}</p>
+  </div>
+</div>
+
+<div class="stack" style="gap: 8px; margin-top: auto;">
+  <form method="post" action="{{ link('/list') }}" enctype="multipart/form-data">
+    <label class="btn btn--primary btn--lg btn--block file"><input type="file" name="photo" accept="image/*" capture="environment" onchange="this.form.submit()" aria-label="Take another photo">{{ ui.icon('camera') }}Take another photo</label>
+  </form>
+  {% if not refused %}<a class="btn btn--secondary btn--block" href="{{ link('/items/' ~ item.id ~ '/edit') }}">Fill it in myself</a>{% endif %}
+</div>
+{% endblock %}

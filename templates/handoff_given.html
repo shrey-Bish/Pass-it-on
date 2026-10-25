@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Handed over · Pass It On{% endblock %}
+{% block main_style %}style="padding-top: 56px; gap: 28px;"{% endblock %}
+{% block content %}
+<div class="hop" aria-hidden="true">
+  <span class="hop__who"><span class="avatar avatar--you">{{ me.name[:1] }}</span>You</span>
+  <span class="hop__track">{% if photo %}<img class="hop__item" src="{{ photo }}" alt="">{% endif %}</span>
+  <span class="hop__who"><span class="avatar">{{ other.name[:1] }}</span>{{ other.name }}</span>
+</div>
+
+<div class="result after-hop" role="status">
+  <h1 class="result__title">Handed over</h1>
+  <p class="result__text">{{ other.name }} has {{ owner }} now. Thanks for passing it on.</p>
+</div>
+
+<a class="btn btn--primary btn--lg btn--block" href="{{ link('/') }}" style="margin-top: auto;">Done</a>
+{% endblock %}

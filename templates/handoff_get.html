@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}I got it · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/', 'Home') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 24px;"{% endblock %}
+{% block content %}
+<header class="head" style="gap: 8px;">
+  <h1 class="title">Get {{ owner }}</h1>
+  {{ ui.meta(when, where) }}
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">Not yet</p><p class="alert__text">{{ error }}</p></div></div>{% endif %}
+
+<form id="code-form" class="card stack" method="post" action="{{ link('/legs/' ~ leg.id ~ '/code') }}" style="gap: 20px; padding: 24px 20px; align-items: center;">
+  <span class="tile__icon" style="width: 64px; height: 64px;">{{ ui.icon('scan', 'icon--xl') }}</span>
+  <p class="center" style="font-size: 17px; line-height: 1.45; max-width: 26ch;">Scan {{ other.name }}'s QR with your camera, or type the code</p>
+  <div class="field" style="width: 100%; align-items: center;">
+    <label class="sr-only" for="code">4-digit code</label>
+    <input class="code-input" id="code" name="code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" placeholder="····" required>
+  </div>
+</form>
+
+<button class="btn btn--primary btn--lg btn--block" form="code-form">I got it</button>
+
+{% if marks %}<p class="note center"><span class="mark-key" aria-hidden="true">1</span>Look for: {{ marks[0][:1] | lower }}{{ marks[0][1:] }}.</p>{% endif %}
+{% endblock %}

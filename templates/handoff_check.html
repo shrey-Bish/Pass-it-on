@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ 'Photo matches' if match else "Photo doesn't match" }} · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/legs/' ~ leg.id, 'Back') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 24px;"{% endblock %}
+{% block content %}
+<div class="photo">
+  <img src="{{ checkin }}" alt="Your check-in photo">
+  {% if match %}<span class="photo__chip">{{ ui.icon('check', 'icon--sm') }}Matches the listing</span>
+  {% else %}<span class="photo__chip photo__chip--warn">{{ ui.icon('alert', 'icon--sm') }}Doesn't match</span>{% endif %}
+</div>
+
+{% if match %}
+<div class="result" role="status">
+  <span class="result__badge">{{ ui.icon('check', 'icon--xl') }}</span>
+  <h1 class="result__title">Photo matches</h1>
+  <p class="result__text">{{ why }}</p>
+</div>
+<a class="btn btn--primary btn--lg btn--block" href="{{ link('/') }}" style="margin-top: auto;">Done</a>
+{% else %}
+<div class="result" role="alert">
+  <span class="result__badge result__badge--warn">{{ ui.icon('alert', 'icon--xl') }}</span>
+  <h1 class="result__title" style="font-size: 24px;">That photo doesn't match the listing.</h1>
+  <p class="result__text">I've let {{ owner }} know. {{ why }}</p>
+</div>
+{% if marks %}
+<div class="card stack" style="gap: 10px;">
+  <p class="item__line">The listing has</p>
+  {% for m in marks %}<p class="drow__mark"><span class="mark-key" aria-hidden="true">{{ loop.index }}</span>{{ m }}</p>{% endfor %}
+</div>
+{% endif %}
+<div class="actions" style="margin-top: auto;">
+  <a class="btn btn--secondary btn--lg" href="{{ link('/legs/' ~ leg.id) }}">Retake photo</a>
+  <a class="btn btn--primary btn--lg" href="{{ link('/') }}">Done</a>
+</div>
+{% endif %}
+{% endblock %}

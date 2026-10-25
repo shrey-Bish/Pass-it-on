@@ -1,6 +1,12 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ title }} · Pass It On{% endblock %}
+{% block main_style %}style="padding-top: 72px; gap: 28px;"{% endblock %}
 {% block content %}
-<h1>{{ title }}</h1>
-<p class="lede">{{ body }}</p>
-<a class="btn primary wide" href="{{ link('/') }}">Home</a>
+<div class="result" role="{{ 'alert' if warn else 'status' }}">
+  <span class="result__badge{{ ' result__badge--warn' if warn }}">{{ ui.icon('alert' if warn else 'check', 'icon--xl') }}</span>
+  <h1 class="result__title">{{ title }}</h1>
+  <p class="result__text">{{ body }}</p>
+</div>
+<a class="btn btn--primary btn--lg btn--block" href="{{ link('/') }}" style="margin-top: auto;">Home</a>
 {% endblock %}

@@ -1,10 +1,21 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Texts · Pass It On{% endblock %}
+{% block main_style %}style="gap: 20px;"{% endblock %}
 {% block content %}
-<h1>Texts</h1>
-<p class="lede">What your stuff, and the stuff you borrow, has said to you.</p>
-<div class="stack">
-{% for m in messages %}
-  <div class="bubble"><p>{{ m.text }}</p><time>{{ day(m.at) }}, {{ clock(m.at) }}</time></div>
-{% else %}<p class="empty">Nothing yet.</p>{% endfor %}
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">Texts</h1>
+  <p class="lede">{{ 'These also arrive as texts on your phone.' if texting else 'What your stuff, and the stuff you borrow, says to you.' }}</p>
+</header>
+
+{% if thread %}
+<div class="thread" aria-live="polite">
+  {% for m in thread %}{{ ui.text_msg(m) }}{% endfor %}
 </div>
+{% else %}
+<div class="row" style="padding: 4px 0;">
+  <span class="empty__icon">{{ ui.icon('texts') }}</span>
+  <div class="grow"><p class="item__name">Nothing yet</p><p class="item__line">When you lend or borrow, the item texts you here.</p></div>
+</div>
+{% endif %}
 {% endblock %}

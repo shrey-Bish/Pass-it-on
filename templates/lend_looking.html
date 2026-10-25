@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{#- No JavaScript: the page refreshes every 2 s until the photo has been read. -#}
+{% block head %}<meta http-equiv="refresh" content="2">{% endblock %}
+{% block title %}Looking at your photo · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/list', 'Cancel') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 24px;"{% endblock %}
+{% block content %}
+<header class="head">
+  <h1 class="title">Looking at your photo…</h1>
+  <p class="lede">This takes about 10 seconds.</p>
+</header>
+
+<div class="photo scan" aria-label="Your photo, being read">
+  <img src="{{ photo }}" alt="">
+</div>
+
+<ul class="steps" aria-live="polite">
+  {% for s in steps %}
+  {% set state = 'is-done' if loop.index0 < step else ('is-active' if loop.index0 == step else 'is-waiting') %}
+  <li class="step {{ state }}"><span class="step__mark">{% if loop.index0 < step %}{{ ui.icon('check') }}{% endif %}</span>{{ s }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

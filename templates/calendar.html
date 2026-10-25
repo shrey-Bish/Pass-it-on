@@ -1,21 +1,68 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Calendar · Pass It On{% endblock %}
+{% block main_style %}style="gap: 24px;"{% endblock %}
 {% block content %}
-<h1>Your calendar</h1>
-<p class="lede">Your exams keep your stuff with you, and show when you'll need to borrow. Nobody else ever sees your calendar.</p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-{% if imported %}<p class="note">Imported. Found {{ imported }} exam{{ '' if imported == '1' else 's' }}.</p>{% endif %}
-<form class="card stack" method="post" action="{{ link('/calendar') }}" enctype="multipart/form-data">
-  <label>Canvas calendar link <span class="hint">Canvas → Calendar → Calendar Feed</span><input type="url" name="url" placeholder="https://canvas.asu.edu/feeds/calendars/…"></label>
-  <label>Or the .ics file<input type="file" name="file" accept=".ics,text/calendar"></label>
-  <button class="btn primary wide">Import</button>
-</form>
-<form class="row" method="post" action="{{ link('/calendar') }}">
-  <span class="small">Or try a sample:</span>
-  {% for s in ['maya','jay','priya'] %}<button class="btn" name="sample" value="{{ s }}">{{ s|capitalize }}</button>{% endfor %}
-</form>
-<section>
-  <h2>Exams (your stuff stays with you)</h2>
-  <div class="stack">{% for e in exams %}<div class="card"><p>{{ describe(e) }}</p></div>{% else %}<p class="empty">None yet.</p>{% endfor %}</div>
+<header class="head" style="padding-top: 12px;">
+  <h1 class="title">Calendar</h1>
+  <p class="lede">{{ 'Your stuff stays with you during your exams.' if connected and not changing else 'Add your exams so your stuff stays with you when you need it.' }}</p>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">That didn't work</p><p class="alert__text">{{ error }}</p></div></div>{% endif %}
+
+{% if connected and not changing %}
+<section class="section" aria-label="Your calendar">
+  <div class="card row" style="padding: 12px 8px 12px 16px;">
+    <span class="empty__icon">{{ ui.icon('link') }}</span>
+    <div class="item__body"><p class="item__name">Canvas calendar</p>{{ ui.pill('connected') }}</div>
+    <a class="btn btn--quiet btn--link" href="{{ link('/calendar?change=1') }}">Change</a>
+  </div>
+  {{ ui.note('lock', 'Nobody else ever sees your calendar.') }}
 </section>
-{% if classes %}<section><h2>Classes</h2><div class="stack">{% for e in classes %}<p class="small">{{ describe(e) }}</p>{% endfor %}</div></section>{% endif %}
+
+<section class="section" aria-labelledby="exams-h">
+  <h2 class="section__title" id="exams-h">Your stuff stays with you during these</h2>
+  {% if exams %}
+  <div class="card card--flush list">
+    {% for e in exams %}
+      {% if e.needs %}
+      <form method="post" action="{{ link('/borrow/exam/' ~ e.uid) }}" style="display: contents;">
+        <button class="list__row" style="width: 100%; border: 0; background: none; text-align: left; cursor: pointer;">
+          <span class="date"><span class="date__dow">{{ e.dow }}</span><span class="date__day">{{ e.day }}</span></span>
+          <span class="item__body"><span class="item__name">{{ e.name }}</span><span class="item__line">{{ e.line }}</span>{{ ui.pill('no_calc') }}</span>
+          {{ ui.icon('chevron') }}
+        </button>
+      </form>
+      {% else %}
+      <div class="list__row">
+        <span class="date"><span class="date__dow">{{ e.dow }}</span><span class="date__day">{{ e.day }}</span></span>
+        <div class="item__body"><p class="item__name">{{ e.name }}</p><p class="item__line">{{ e.line }}</p></div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="item__line">No exams found in your calendar.</p>
+  {% endif %}
+  {{ ui.note('lock', 'When something is planned around an exam, only the time and building are shared, never why.') }}
+</section>
+{% else %}
+<form class="card stack" method="post" action="{{ link('/calendar') }}" enctype="multipart/form-data" style="gap: 16px;">
+  <div class="field">
+    <label class="label" for="feed">Paste your Canvas calendar link</label>
+    <input class="input" id="feed" name="url" type="url" inputmode="url" autocomplete="off" placeholder="https://canvas.asu.edu/feeds/…">
+    <span class="hint">In Canvas, open Calendar, then Calendar Feed, and copy the link.</span>
+  </div>
+  <button class="btn btn--primary btn--block">Connect</button>
+  <p class="or">or</p>
+  <label class="btn btn--secondary btn--block file"><input type="file" name="file" accept=".ics,text/calendar" onchange="this.form.submit()" aria-label="Upload an .ics file">{{ ui.icon('file') }}Upload an .ics file</label>
+</form>
+
+<form class="samples" method="post" action="{{ link('/calendar') }}">
+  <span>Trying it out? Use a made-up calendar:</span>
+  {% for s in ['maya', 'jay', 'priya'] %}<button class="btn btn--quiet btn--link" name="sample" value="{{ s }}">{{ s | capitalize }}</button>{% endfor %}
+</form>
+
+{{ ui.note('lock', 'Nobody else ever sees your calendar.') }}
+{% endif %}
 {% endblock %}

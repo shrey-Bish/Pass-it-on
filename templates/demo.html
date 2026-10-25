@@ -1,48 +1,62 @@
+{% import "_ui.html" as ui with context %}
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pass It On demo</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap">
-<style>
-  body { margin: 0; background: #ece8df; font: 400 15px/1.5 "Inter", -apple-system, Helvetica, Arial, sans-serif; color: #1d1c19; }
-  header { padding: 18px 20px 6px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-  h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
-  .clock { font-weight: 700; font-variant-numeric: tabular-nums; }
-  .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 20px 14px; }
-  button { font: 600 14px/1 inherit; font-family: inherit; padding: 10px 14px; border-radius: 999px; border: 1px solid #d8d2c5; background: #fff; cursor: pointer; }
-  button.main { background: #1f7a55; color: #fff; border-color: #1f7a55; }
-  .phones { display: flex; gap: 18px; overflow-x: auto; padding: 4px 20px 30px; }
-  .phone { flex: 0 0 auto; display: grid; gap: 8px; justify-items: center; }
-  .phone b { font-size: 14px; }
-  iframe { width: 360px; height: 720px; border: 10px solid #1d1c19; border-radius: 34px; background: #f6f4ef; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pass It On · Live demo</title>
+  <link rel="icon" href="/static/brand-mark.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/static/pass-it-on.css">
+  <link rel="stylesheet" href="/static/passiton.css">
 </head>
 <body>
-<header>
-  <h1>Pass It On · demo</h1>
-  <span>Made-up students, one Thursday. <span class="clock" id="clock">{{ day(now) }}, {{ clock(now) }}</span></span>
-</header>
-<div class="controls">
-  <button class="main" data-a="next">Skip to the next handoff</button>
-  <button data-a="exam">Move Jay's exam +1 h</button>
-  <button data-a="late">Jay is running late</button>
-  <button data-a="moveout">Maya moves out</button>
-  <button data-a="reset">Start over</button>
-</div>
-<div class="phones">
-  {% for person, token in sessions.items() if person != 'dev' %}
-  <div class="phone"><b>{{ person|capitalize }}</b><iframe src="/?s={{ token }}" title="{{ person }}'s phone"></iframe></div>
-  {% endfor %}
+<div class="demo">
+  <div class="demo__inner">
+    <header class="demo__bar">
+      {{ ui.brand('<span class="muted" style="font-weight: 500;">&nbsp;· Live demo</span>') }}
+      <div class="clock" role="timer" aria-live="polite"><span class="clock__time" id="clock">{{ now.strftime('%a %b %-d') }}, {{ clock(now) }}</span><span class="clock__label">Demo clock</span></div>
+      <p class="hint" style="min-width: 220px; text-align: right;">Made-up students, the real app</p>
+    </header>
+
+    <div class="controls">
+      <button class="btn btn--primary" type="button" data-a="next">{{ ui.icon('arrow') }}Skip to the next handoff</button>
+      <button class="btn btn--secondary" type="button" data-a="exam">Move Jay's exam +1 h</button>
+      <button class="btn btn--secondary" type="button" data-a="late">Jay is running late</button>
+      <button class="btn btn--secondary" type="button" data-a="moveout">Maya moves out</button>
+      <button class="btn btn--quiet" type="button" data-a="reset">Start over</button>
+    </div>
+
+    <p class="happening" role="status"><span class="live-dot" aria-hidden="true"></span><b>Next:</b>&nbsp;<span id="happening">{{ happening }}</span></p>
+
+    <div class="phones">
+      {% for person, token in sessions.items() %}
+      <section class="phone" aria-label="{{ names[person] }}'s phone">
+        <p class="phone__label"><span class="avatar avatar--sm">{{ names[person][:1] }}</span>{{ names[person] }}<span class="muted" style="font-weight: 500;" data-role="{{ person }}">{% if roles[person] %} · {{ roles[person] }}{% endif %}</span></p>
+        <div class="phone__frame"><div class="phone__screen"><iframe src="/?s={{ token }}" title="{{ names[person] }}'s phone"></iframe></div></div>
+      </section>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 <script>
+  // Each button changes the shared demo world, then every phone reloads to show its own part.
   document.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", async () => {
-    b.disabled = true;
-    const r = await (await fetch(`/demo/${b.dataset.a}`, { method: "POST" })).json();
-    document.getElementById("clock").textContent = r.clock;
-    document.querySelectorAll("iframe").forEach(f => f.contentWindow.location.reload());
-    b.disabled = false;
+    document.querySelectorAll("button[data-a]").forEach(x => x.disabled = true);
+    try {
+      const r = await (await fetch(`/demo/${b.dataset.a}`, { method: "POST" })).json();
+      document.getElementById("clock").textContent = r.clock;
+      document.getElementById("happening").textContent = r.happening;
+      for (const [person, role] of Object.entries(r.roles)) {
+        const el = document.querySelector(`[data-role="${person}"]`);
+        if (el) el.textContent = role ? ` · ${role}` : "";
+      }
+      document.querySelectorAll("iframe").forEach(f => f.contentWindow.location.reload());
+    } finally {
+      document.querySelectorAll("button[data-a]").forEach(x => x.disabled = false);
+    }
   }));
 </script>
 </body>

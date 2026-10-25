@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{#- Refreshes every 3 s so it turns into "Handed over" as soon as they scan. -#}
+{% block head %}{% if not demo %}<meta http-equiv="refresh" content="3">{% endif %}{% endblock %}
+{% block title %}Hand it over · Pass It On{% endblock %}
+{% block topbar %}{{ ui.back('/', 'Home') }}{% endblock %}
+{% block main_style %}style="padding-top: 4px; gap: 20px;"{% endblock %}
+{% block content %}
+<h1 class="title">Hand it to {{ other.name }}</h1>
+
+{% if h %}{{ ui.qr_block(qr, h.code) }}{% endif %}
+
+<p class="center" style="font-size: 17px; line-height: 1.45; padding: 0 8px;"><b style="font-weight: 650;">{{ when }} at {{ where }}.</b> Ask {{ other.name }} to scan this with their camera.</p>
+
+<p class="waiting" role="status"><span class="live-dot" aria-hidden="true"></span>Waiting for {{ other.name }} to scan</p>
+{% endblock %}

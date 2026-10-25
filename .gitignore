@@ -9,3 +9,6 @@ __pycache__/
 # Uploaded photos and raw recordings can show real people and places; never commit them
 data/
 media/
+
+# Claude Design export (the canvas is the source; its stylesheet lives in static/pass-it-on.css)
+claude design/

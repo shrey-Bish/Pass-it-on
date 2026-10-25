@@ -1,10 +1,19 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Your name · Pass It On{% endblock %}
+{% block main_style %}style="padding-top: 24px;"{% endblock %}
 {% block content %}
-<h1>What's your first name?</h1>
-<p class="lede">Classmates only ever see your first name.</p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
+{{ ui.brand() }}
+<header class="head">
+  <h1 class="title">What's your first name?</h1>
+  <p class="lede">Classmates only ever see your first name.</p>
+</header>
+{% if error %}<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">{{ error }}</p></div></div>{% endif %}
 <form class="stack" method="post" action="{{ link('/name') }}">
-  <input type="text" name="name" autocomplete="given-name" required>
-  <button class="btn primary wide">Save</button>
+  <div class="field">
+    <label class="label" for="name">First name</label>
+    <input class="input" id="name" name="name" autocomplete="given-name" required>
+  </div>
+  <button class="btn btn--primary btn--lg btn--block">Continue</button>
 </form>
 {% endblock %}

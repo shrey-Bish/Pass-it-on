@@ -1,31 +1,91 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Is this right? · Pass It On{% endblock %}
+{% block topbar %}
+<div class="topbar">
+  <a class="back" href="{{ link('/list') }}">{{ ui.icon('back', 'icon--lg') }}{{ 'Retake' if not item.listed else 'Back' }}</a>
+  {% if not item.listed %}<span class="eyebrow" style="padding-right: 8px;">Step 2 of 2</span>{% endif %}
+</div>
+{% endblock %}
+{% block main_style %}style="padding-top: 4px; padding-bottom: 0;"{% endblock %}
 {% block content %}
-<h1>Is this right?</h1>
-<div class="photo"><img src="{{ link('/photos/' ~ item.photo) }}" alt="Your photo"></div>
-<form class="stack" method="post" action="{{ link('/items/' ~ item.id ~ '/edit') }}">
-  <label>What it is<input type="text" name="type" value="{{ item.type }}"></label>
-  <label>Its marks <span class="hint">used to check it's the same one at each handoff</span><textarea name="fingerprint">{{ item.fingerprint }}</textarea></label>
-  <p class="small">Condition: {{ item.condition }} · Value: {{ item.value_tier }}</p>
-  <h2>Your rules</h2>
-  <p class="small">It always stays with you during your own exams.</p>
-  <label>Home by<input type="time" name="return_by" value="{{ item.rules.return_by }}"></label>
-  <label>Where it starts and ends each day
-    <select name="home">{% for code, b in buildings.items() %}<option value="{{ code }}" {{ 'selected' if code == item.rules.home_building }}>{{ b.name }}</option>{% endfor %}</select></label>
-  <label>Who can borrow it
-    <select name="audience">
-      <option value="asu" {{ 'selected' if item.rules.audience == 'asu' }}>Anyone at ASU</option>
-      <option value="friends_of_friends" {{ 'selected' if item.rules.audience == 'friends_of_friends' }}>Friends of friends</option>
-      <option value="friends" {{ 'selected' if item.rules.audience == 'friends' }}>Friends only</option>
-    </select></label>
-  <label>Lowest reliability rating
-    <select name="min_rating">{% for b in ['new','ok','good','great'] %}<option value="{{ b }}" {{ 'selected' if b == item.rules.min_rating }}>{{ b }}</option>{% endfor %}</select></label>
-  <label class="check"><input type="checkbox" name="auto_approve" value="1" {{ 'checked' if item.rules.auto_approve }}> Say yes for me when the rating fits</label>
-  <h2>Its personality</h2>
-  <div class="choices">
-  {% for p, line in samples.items() %}
-    <label class="choice"><input type="radio" name="persona" value="{{ p }}" {{ 'checked' if p == item.persona }}><span>{{ p|capitalize }}</span><span class="say">“{{ line }}”</span></label>
-  {% endfor %}
+<form method="post" action="{{ link('/items/' ~ item.id ~ '/edit') }}" class="stack" style="gap: 28px;">
+<header class="head">
+  <h1 class="title">Is this right?</h1>
+  <p class="lede">Fix anything I got wrong.</p>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ ui.icon('alert') }}<div><p class="alert__title">One more thing</p><p class="alert__text">{{ error }}</p></div></div>{% endif %}
+
+<section class="section" aria-label="What I found">
+  {% if photo %}<div class="photo" style="view-transition-name: photo-{{ item.id }}"><img src="{{ photo }}" alt="Your photo of {{ item.type or 'the item' }}"></div>{% endif %}
+  <div class="rows">
+    <details class="edit"{% if not item.type %} open{% endif %}>
+      <summary class="drow"><div class="drow__body"><span class="drow__label">What it is</span><span class="drow__value">{{ item.type or 'Tell me what it is' }}</span></div><span class="btn btn--quiet btn--link">Change</span></summary>
+      <div class="edit__body"><label class="sr-only" for="type">What it is</label><input class="input" id="type" name="type" value="{{ item.type }}" placeholder="TI-84 Plus CE"></div>
+    </details>
+    <details class="edit">
+      <summary class="drow drow--top"><div class="drow__body"><span class="drow__label">Marks</span>
+        {% for m in marks %}<span class="drow__mark"><span class="mark-key" aria-hidden="true">{{ loop.index }}</span>{{ m }}</span>{% else %}<span class="drow__value">None noted yet</span>{% endfor %}
+      </div><span class="btn btn--quiet btn--link">Change</span></summary>
+      <div class="edit__body"><label class="sr-only" for="marks">Marks, one per line</label><textarea class="textarea" id="marks" name="fingerprint" rows="3" placeholder="Yellow smiley sticker, bottom-right">{{ marks | join('\n') }}</textarea><span class="hint">One per line. They help check it's the same one at each handoff.</span></div>
+    </details>
+    <details class="edit">
+      <summary class="drow"><div class="drow__body"><span class="drow__label">Value</span><span class="drow__value">{{ value_label }}</span></div><span class="btn btn--quiet btn--link">Change</span></summary>
+      <div class="edit__body"><div class="seg">{% for key, label in values %}<label class="seg__opt"><input type="radio" name="value_tier" value="{{ key }}"{% if key == item.value_tier %} checked{% endif %}>{{ label }}</label>{% endfor %}</div></div>
+    </details>
   </div>
-  <button class="btn primary wide">List it</button>
+  <fieldset class="field">
+    <legend class="label">Condition</legend>
+    <div class="seg">{% for key, label in conditions %}<label class="seg__opt"><input type="radio" name="condition" value="{{ key }}"{% if key == condition %} checked{% endif %}>{{ label }}</label>{% endfor %}</div>
+  </fieldset>
+</section>
+
+<section class="section" aria-labelledby="rules-h">
+  <h2 class="section__title" id="rules-h">Your rules</h2>
+  <p class="hint">It always stays with you during your own exams.</p>
+  <div class="rows">
+    <details class="edit">
+      <summary class="drow"><div class="drow__body"><span class="drow__label">Home by</span><span class="drow__value">{{ return_label }}</span></div><span class="btn btn--quiet btn--link">Change</span></summary>
+      <div class="edit__body"><label class="sr-only" for="return_by">Home by</label><input class="input" id="return_by" name="return_by" type="time" value="{{ item.rules.return_by }}"></div>
+    </details>
+    <details class="edit">
+      <summary class="drow"><div class="drow__body"><span class="drow__label">Starts and ends at</span><span class="drow__value">{{ home_label }}</span></div><span class="btn btn--quiet btn--link">Change</span></summary>
+      <div class="edit__body"><label class="sr-only" for="home">Starts and ends at</label>
+        <select class="input" id="home" name="home">{% for code, b in buildings.items() %}<option value="{{ code }}"{% if code == item.rules.home_building %} selected{% endif %}>{{ b.name }}</option>{% endfor %}</select>
+      </div>
+    </details>
+  </div>
+  <fieldset class="field">
+    <legend class="label">Who can borrow</legend>
+    <div class="choices">
+      {% for key, label in audiences %}<label class="choice"><input class="radio" type="radio" name="audience" value="{{ key }}"{% if key == item.rules.audience %} checked{% endif %}>{{ label }}</label>{% endfor %}
+    </div>
+  </fieldset>
+  <fieldset class="field">
+    <legend class="label">Lowest rating</legend>
+    <div class="seg">{% for key, label in ratings %}<label class="seg__opt"><input type="radio" name="min_rating" value="{{ key }}"{% if key == item.rules.min_rating %} checked{% endif %}>{{ label }}</label>{% endfor %}</div>
+    <p class="hint">Ratings come from showing up on time and handing things back.</p>
+  </fieldset>
+  <label class="card switch-row">
+    <span class="grow"><span class="label">Say yes for me when the rating fits</span><span class="hint" style="margin-top: 2px;">I'll still tell you who has it.</span></span>
+    <input class="switch" type="checkbox" role="switch" name="auto_approve" value="1"{% if item.rules.auto_approve %} checked{% endif %}>
+  </label>
+</section>
+
+<fieldset class="section" aria-labelledby="voice-h">
+  <div class="head">
+    <h2 class="section__title" id="voice-h">Give it a personality</h2>
+    <p class="hint">It texts whoever has it, in this voice.</p>
+  </div>
+  <div class="personas">
+    {% for key, name, desc in personas %}{{ ui.persona(key, name, desc, samples[key], key == item.persona) }}{% endfor %}
+  </div>
+</fieldset>
+
+<div class="dock" style="margin: 0 calc(-1 * var(--gutter));">
+  <button class="btn btn--primary btn--lg btn--block">{{ 'List it' if not item.listed else 'Save' }}</button>
+  {{ ui.note('lock', 'Classmates only see your first name.', 'center') }}
+</div>
 </form>
 {% endblock %}
