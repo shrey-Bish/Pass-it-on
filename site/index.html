@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pass It On</title>
+<meta name="description" content="Your stuff has an agent now. A classmate's calculator plans its own day around everyone's exams.">
+<meta property="og:title" content="Pass It On: your stuff has an agent now.">
+<meta property="og:description" content="A classmate's calculator plans its own day around everyone's exams. Cubbie Hackathon, Track 2.">
+<link rel="icon" href="img/brand-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap">
+<style>
+  /* The app's own look: warm cream, ink, one green accent. */
+  :root {
+    color-scheme: light;
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --ink: #1d1c19;
+    --muted: #6c685f;
+    --line: #e6e1d6;
+    --neutral: #efebe2;
+    --accent: #1f7a55;
+    --accent-ink: #17603f;
+    --soft: #e2f0e8;
+    --warn: #a8501a;
+    --warn-soft: #f8ebe1;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --shadow: 0 1px 2px rgba(29, 28, 25, 0.04), 0 14px 34px -18px rgba(29, 28, 25, 0.22);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+  h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.025em; }
+  h2 { font-size: clamp(30px, 4.4vw, 44px); font-weight: 800; line-height: 1.06; }
+  p { margin: 0; }
+  .g { color: var(--accent); }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
+  .lede { color: var(--muted); font-size: 18px; max-width: 40ch; }
+  section { padding-block: clamp(56px, 8vw, 96px); }
+  .head { display: grid; gap: 12px; margin-bottom: 36px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding-block: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; text-decoration: none; }
+  .brand img { width: 30px; height: 30px; }
+  .nav-links { display: flex; gap: 24px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  .nav-links a { text-decoration: none; }
+  .nav-links a:hover { color: var(--ink); }
+
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 56px; align-items: center; padding-block: 36px 72px; }
+  .hero h1 { font-size: clamp(52px, 8.4vw, 96px); font-weight: 800; line-height: 0.95; letter-spacing: -0.045em; margin-top: 16px; }
+  .hero .lede { margin-top: 20px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .btn { display: inline-flex; align-items: center; padding: 14px 24px; border-radius: 999px; font: 600 16px/1 var(--sans); text-decoration: none;
+         border: 1px solid #cdc5b6; background: var(--card); color: var(--ink); transition: transform .15s, background .15s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #19664a; }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .video { width: min(300px, 100%); justify-self: center; }
+  .video-frame { aspect-ratio: 9 / 16; width: 100%; border-radius: 28px; overflow: hidden; background: #111; border: 6px solid #111;
+                 box-shadow: 0 40px 80px -30px rgba(29, 28, 25, 0.45); }
+  .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .video-link { margin-top: 14px; text-align: center; font-size: 14px; color: var(--muted); }
+
+  /* The moment */
+  .moment { display: grid; justify-items: center; gap: 18px; text-align: center; }
+  .bubble { max-width: 520px; padding: 16px 22px; border-radius: 24px; border-bottom-left-radius: 8px; background: #e9e9eb; color: #111;
+            font-size: clamp(20px, 2.6vw, 26px); line-height: 1.3; font-weight: 500; text-align: left; justify-self: center; }
+  .from { font-size: 14px; color: var(--muted); margin-bottom: -10px; }
+
+  /* Screens */
+  .shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+  .shot { display: grid; gap: 14px; align-content: start; }
+  .shot img { border-radius: 26px; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--card); }
+  .shot h3 { font-size: 18px; font-weight: 700; }
+  .shot p { font-size: 15px; color: var(--muted); margin-top: -8px; }
+  .tinted { background: #efebe2; }
+
+  /* What's shared */
+  .shared { padding: 26px 28px; display: grid; gap: 16px; max-width: 760px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .row b { width: 72px; font-size: 15px; }
+  .chip { padding: 7px 14px; border-radius: 999px; font-size: 15px; font-weight: 600; background: var(--soft); color: var(--accent-ink); }
+  .chip.no { background: var(--warn-soft); color: var(--warn); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
+  footer { background: var(--accent); color: #fff; padding-block: 52px 60px; }
+  footer .wrap { display: grid; gap: 26px; }
+  footer h3 { font-size: 24px; margin-bottom: 6px; }
+  footer p { color: rgba(255, 255, 255, 0.85); max-width: 52ch; }
+  .credits { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .nav-links a.hide-sm { display: none; }
+    .shots { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="#"><img src="img/brand-mark.svg" alt="" width="30" height="30">Pass It On</a>
+    <div class="nav-links">
+      <a class="hide-sm" href="#how">How it works</a>
+      <a href="https://github.com/shrey-Bish/Pass-it-on">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Cubbie Hackathon · Track 2</p>
+      <h1>Your stuff has an agent now<span class="g">.</span></h1>
+      <p class="lede">A classmate's calculator plans its own day, around everyone's exams.</p>
+      <div class="actions">
+        <a class="btn primary" href="#how">How it works</a>
+        <a class="btn" href="https://github.com/shrey-Bish/Pass-it-on">See the code</a>
+      </div>
+    </div>
+    <div class="video">
+      <div class="video-frame">
+        <iframe src="https://drive.google.com/file/d/1udpUBQXdrY9GO4o798WYyoYqQGYMYvMZ/preview" title="Pass It On 1-minute video"
+                loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <p class="video-link"><a href="https://drive.google.com/file/d/1udpUBQXdrY9GO4o798WYyoYqQGYMYvMZ/view">Open the video in Google Drive</a></p>
+    </div>
+  </header>
+</div>
+
+<section style="padding-top:0">
+  <div class="wrap moment">
+    <p class="from">Every exam week, in every group chat</p>
+    <p class="bubble">anyone have a graphing calculator i can borrow for tomorrow 😭</p>
+    <p class="lede">Meanwhile, dozens sit unused in backpacks.</p>
+  </div>
+</section>
+
+<section id="how" class="tinted">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">How it works</p>
+      <h2>One item. One agent<span class="g">.</span></h2>
+    </div>
+    <ol class="shots">
+      <li class="shot"><img src="img/lend.jpg" width="540" height="1168" alt="The app reads a photo of a calculator and spots its sticker." loading="lazy">
+        <h3>List it</h3><p>Snap a photo. It spots what makes it yours.</p></li>
+      <li class="shot"><img src="img/route.jpg" width="540" height="1168" alt="The calculator's route for the day: Maya to Jay to Priya and back to Maya." loading="lazy">
+        <h3>It plans its day</h3><p>Around everyone's exams and walks.</p></li>
+      <li class="shot"><img src="img/handoff.jpg" width="540" height="1168" alt="A one-time QR code and a 4-digit code to hand the calculator to Jay." loading="lazy">
+        <h3>Hand it over</h3><p>A one-time QR code moves it.</p></li>
+      <li class="shot"><img src="img/texts.jpg" width="540" height="1168" alt="The calculator's texts through the day, ending: Maya graduated. I live with Priya now." loading="lazy">
+        <h3>It texts you</h3><p>In character, all day long.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Privacy</p>
+      <h2>Agents share the minimum<span class="g">.</span></h2>
+    </div>
+    <div class="shared card">
+      <div class="row"><b>Shared</b><span class="chip">item</span><span class="chip">time</span><span class="chip">building</span><span class="chip">yes or no</span></div>
+      <div class="row"><b>Never</b><span class="chip no">schedules</span><span class="chip no">grades</span><span class="chip no">reasons</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h3>Built for Cubbie</h3>
+      <p>When Cubbie supports agent-to-agent messaging, each student's Cubbie becomes their agent here.</p>
+    </div>
+    <div class="credits">
+      <span>Enrollment Goblins · Shrey Bishnoi and Sumanth Akella</span>
+      <a href="https://github.com/shrey-Bish/Pass-it-on">github.com/shrey-Bish/Pass-it-on</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
