@@ -97,6 +97,11 @@ async def jay_late(hub: Hub) -> set[str]:
     return await hub.running_late("jay", 30)
 
 
+async def evening(hub: Hub) -> None:
+    """Every handoff happens on time and the calculator is home (used for recording the end of the day)."""
+    await finish_until(hub, START.replace(hour=17, minute=30))
+
+
 async def maya_moves_out(hub: Hub) -> None:
     """The day ends with the calculator home, then Maya moves out and it looks for its next owner."""
     await finish_until(hub, START.replace(hour=17, minute=30))

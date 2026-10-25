@@ -1,0 +1,64 @@
+/* The phone's own texting screens (lock screen + thread): a generic SMS look, not any brand's. */
+:root {
+  --ink: #111111; --muted: #8a8a8e; --incoming: #e9e9eb; --line: #e3e3e6; --link: #1f7a55;
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; background: #fff; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+.device { position: relative; display: flex; flex-direction: column; max-width: 480px; height: 100vh; height: 100dvh; margin: 0 auto; overflow: hidden; }
+
+/* Status bar */
+.status { display: flex; align-items: center; justify-content: space-between; height: 50px; padding: 14px 30px 0 34px; flex: none;
+          font-weight: 600; font-size: 17px; letter-spacing: -.01em; }
+.status__icons { display: flex; align-items: center; gap: 6px; }
+.status__icons svg { height: 12px; width: auto; fill: currentColor; }
+
+/* Thread (Messages-style) */
+.head { display: flex; align-items: flex-start; justify-content: space-between; padding: 6px 12px 10px; border-bottom: 1px solid var(--line);
+        background: rgba(249, 249, 249, .94); flex: none; }
+.head__back { display: grid; place-items: center; width: 44px; height: 44px; }
+.head__back svg { width: 12px; height: 20px; fill: none; stroke: var(--link); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.head__who { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.head__avatar { width: 52px; height: 52px; border-radius: 50%; }
+.head__name { font-size: 13px; font-weight: 600; }
+.head__number { font-size: 11px; color: var(--muted); }
+.head__spacer { width: 44px; }
+.thread { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 14px 14px 20px; scroll-behavior: smooth; }
+.stamp { align-self: center; margin: 12px 0 6px; font-size: 12px; color: var(--muted); }
+.stamp b { font-weight: 600; }
+.bubble { align-self: flex-start; max-width: 78%; padding: 9px 14px; border-radius: 19px; background: var(--incoming);
+          font-size: 17px; line-height: 1.33; letter-spacing: -.005em; }
+.bubble.is-new { animation: arrive 420ms var(--ease) 500ms both; transform-origin: 0 100%; }
+.composer { display: flex; align-items: center; gap: 10px; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); flex: none; }
+.composer__plus { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #efeff2; color: #7c7c80; font-size: 24px; }
+.composer__field { flex: 1; height: 36px; display: flex; align-items: center; padding: 0 14px; border: 1px solid #d8d8dc; border-radius: 18px;
+                   color: #b0b0b5; font-size: 16px; }
+
+/* Lock screen */
+body.lock { background: #0f3324; color: #fff; }
+body.lock .device { background: radial-gradient(120% 70% at 50% 0%, #2c8a62 0%, #1a5a40 45%, #0f3324 100%); }
+.lock__clock { text-align: center; padding: 26px 0 30px; flex: none; }
+.lock__date { font-size: 20px; font-weight: 600; opacity: .9; }
+.lock__time { font-size: 92px; line-height: 1; font-weight: 700; letter-spacing: -.03em; margin-top: 4px; }
+.notes { display: flex; flex-direction: column; gap: 10px; padding: 0 12px; }
+.note { display: flex; gap: 12px; padding: 13px 14px; border-radius: 22px; background: rgba(255, 255, 255, .82); color: #111;
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+.note:first-child { animation: drop 480ms var(--ease) 450ms both; }
+.note:nth-child(2) { opacity: .9; }
+.note:nth-child(3) { opacity: .75; }
+.note__icon { width: 38px; height: 38px; border-radius: 9px; flex: none; }
+.note__body { flex: 1; min-width: 0; }
+.note__top { display: flex; justify-content: space-between; font-size: 15px; }
+.note__top span { color: #6b6b70; font-size: 14px; }
+.note__text { margin-top: 2px; font-size: 15px; line-height: 1.33; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.lock__empty { text-align: center; opacity: .8; }
+.lock__hint { margin-top: auto; padding: 0 0 34px; text-align: center; font-size: 14px; opacity: .7; }
+
+@keyframes arrive { from { opacity: 0; transform: translateY(14px) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes drop { from { opacity: 0; transform: translateY(-26px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bubble.is-new, .note:first-child { animation: none; } }

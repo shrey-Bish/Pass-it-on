@@ -835,9 +835,35 @@ async def texts(request: Request):
     return ctx.page("texts.html", active_tab="texts", thread=thread, texting=real.messenger.channel != "outbox" and not ctx.demo)
 
 
+@app.get("/phone", response_class=HTMLResponse)
+async def phone(request: Request, view: str = ""):
+    """The texts as they'd arrive on this student's phone: ?view=lock for notifications, else the thread."""
+    ctx = Ctx(request)
+    if redirect := signed_in(ctx):
+        return redirect
+    now = ctx.hub.now()
+    texts = [m for m in ctx.hub.inbox(ctx.user.id) if m.kind != "login"]
+    thread, last = [], None
+    for m in texts:
+        stamp = None
+        if last is None or m.at - last > timedelta(minutes=30) or m.at.date() != last.date():
+            stamp = f"{'Today' if m.at.date() == now.date() else m.at.strftime('%a, %b %-d')} {clock(m.at)}"
+        last = m.at
+        thread.append({"stamp": stamp, "text": m.text})
+
+    def ago(t: datetime) -> str:
+        minutes = int((now - t).total_seconds() // 60)
+        return "now" if minutes < 1 else f"{minutes}m ago" if minutes < 60 else clock(t)
+
+    notes = [{"text": m.text, "ago": ago(m.at)} for m in reversed(texts[-3:])]
+    return templates.TemplateResponse(request, "phone.html", {
+        "me": ctx.user, "now": now, "lock": view == "lock", "thread": thread, "notes": notes, "link": ctx.link})
+
+
 # ---- demo
 
-DEMO_ACTIONS = {"next": demo.next_handoff, "exam": demo.exam_plus_hour, "late": demo.jay_late, "moveout": demo.maya_moves_out}
+DEMO_ACTIONS = {"next": demo.next_handoff, "exam": demo.exam_plus_hour, "late": demo.jay_late,
+                "evening": demo.evening, "moveout": demo.maya_moves_out}
 
 
 async def ensure_demo() -> None:

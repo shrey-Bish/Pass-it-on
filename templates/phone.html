@@ -1,0 +1,74 @@
+{#- The texts as they arrive on a phone: a lock screen with notifications, or the Messages-style thread.
+    It shows this student's real texts from the app (the outbox). In production they're sent by Twilio (or
+    Telegram); the number shown is a made-up 555 one. -#}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="{{ '#123c2b' if lock else '#ffffff' }}">
+  <title>{{ me.name }}'s texts · Pass It On</title>
+  <link rel="icon" href="/static/brand-mark.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/static/phone.css">
+</head>
+<body class="{{ 'lock' if lock else 'sms' }}">
+  <div class="device">
+    <div class="status" aria-hidden="true">
+      <span class="status__time">{{ now.strftime('%-I:%M') }}</span>
+      <span class="status__icons">
+        <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg viewBox="0 0 16 12"><path d="M8 11.5 5.6 9a3.4 3.4 0 0 1 4.8 0zM3.2 6.6a6.8 6.8 0 0 1 9.6 0l-1.7 1.7a4.4 4.4 0 0 0-6.2 0zM.8 4.2a10.2 10.2 0 0 1 14.4 0l-1.7 1.7a7.8 7.8 0 0 0-11 0z"/></svg>
+        <svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="1.6"/><rect x="23.5" y="4" width="2" height="4" rx="1"/></svg>
+      </span>
+    </div>
+
+    {% if lock %}
+    <div class="lock__clock">
+      <p class="lock__date">{{ now.strftime('%A, %B %-d') }}</p>
+      <p class="lock__time">{{ now.strftime('%-I:%M') }}</p>
+    </div>
+    <div class="notes">
+      {% for m in notes %}
+      <a class="note" href="{{ link('/phone') }}">
+        <img class="note__icon" src="/static/brand-mark.svg" alt="">
+        <div class="note__body">
+          <p class="note__top"><b>Pass It On</b><span>{{ 'now' if loop.first else m.ago }}</span></p>
+          <p class="note__text">{{ m.text }}</p>
+        </div>
+      </a>
+      {% else %}
+      <p class="lock__empty">No new texts</p>
+      {% endfor %}
+    </div>
+    <p class="lock__hint">Tap a text to open it</p>
+    {% else %}
+    <header class="head">
+      <a class="head__back" href="{{ link('/phone?view=lock') }}" aria-label="Back to the lock screen"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8"/></svg></a>
+      <div class="head__who">
+        <img class="head__avatar" src="/static/brand-mark.svg" alt="">
+        <p class="head__name">Pass It On</p>
+        <p class="head__number">+1 (480) 555-0142</p>
+      </div>
+      <span class="head__spacer"></span>
+    </header>
+    <main class="thread" id="thread">
+      {% for m in thread %}
+        {% if m.stamp %}<p class="stamp"><b>Text Message</b> · {{ m.stamp }}</p>{% endif %}
+        <p class="bubble{{ ' is-new' if loop.last }}">{{ m.text }}</p>
+      {% else %}
+        <p class="stamp">No texts yet</p>
+      {% endfor %}
+    </main>
+    <div class="composer" aria-hidden="true"><span class="composer__plus">+</span><span class="composer__field">Text Message</span></div>
+    {% endif %}
+  </div>
+  <script>
+    // Open on the newest text, like a real phone.
+    const t = document.getElementById("thread");
+    if (t) t.scrollTop = t.scrollHeight;
+  </script>
+</body>
+</html>

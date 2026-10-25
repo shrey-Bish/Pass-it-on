@@ -34,7 +34,8 @@
     <div class="phones">
       {% for person, token in sessions.items() %}
       <section class="phone" aria-label="{{ names[person] }}'s phone">
-        <p class="phone__label"><span class="avatar avatar--sm">{{ names[person][:1] }}</span>{{ names[person] }}<span class="muted" style="font-weight: 500;" data-role="{{ person }}">{% if roles[person] %} · {{ roles[person] }}{% endif %}</span></p>
+        <p class="phone__label"><span class="avatar avatar--sm">{{ names[person][:1] }}</span>{{ names[person] }}<span class="muted" style="font-weight: 500;" data-role="{{ person }}">{% if roles[person] %} · {{ roles[person] }}{% endif %}</span>
+          <a class="btn btn--quiet btn--link" href="/phone?view=lock&s={{ token }}" target="_blank" rel="noopener">Their texts</a></p>
         <div class="phone__frame"><div class="phone__screen"><iframe src="/?s={{ token }}" title="{{ names[person] }}'s phone"></iframe></div></div>
       </section>
       {% endfor %}

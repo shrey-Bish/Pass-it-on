@@ -68,6 +68,16 @@ def test_demo_buttons(client):
     assert "Live demo" in client.get("/demo").text
 
 
+def test_the_phone_shows_this_students_own_texts(client):
+    client.post("/demo/reset")
+    lock = words(client.get("/phone?view=lock&s=demo-jay").text)
+    assert "Pass It On" in lock and "Coor Hall" in lock and "Thursday, October 29" in lock
+    thread = words(client.get("/phone?s=demo-jay").text)
+    assert "+1 (480) 555-0142" in thread and "Text Message" in thread
+    assert "Priya" not in words(client.get("/phone?s=demo-dev").text)  # Dev's texts never name who has it
+    assert client.get("/phone", follow_redirects=False).status_code == 303
+
+
 def test_pages_need_a_session(client):
     assert client.get("/texts", follow_redirects=False).status_code == 303
     assert client.get("/photos/ti84maya.jpg").status_code == 404
