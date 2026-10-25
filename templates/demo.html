@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pass It On demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap">
+<style>
+  body { margin: 0; background: #ece8df; font: 400 15px/1.5 "Inter", -apple-system, Helvetica, Arial, sans-serif; color: #1d1c19; }
+  header { padding: 18px 20px 6px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+  .clock { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 20px 14px; }
+  button { font: 600 14px/1 inherit; font-family: inherit; padding: 10px 14px; border-radius: 999px; border: 1px solid #d8d2c5; background: #fff; cursor: pointer; }
+  button.main { background: #1f7a55; color: #fff; border-color: #1f7a55; }
+  .phones { display: flex; gap: 18px; overflow-x: auto; padding: 4px 20px 30px; }
+  .phone { flex: 0 0 auto; display: grid; gap: 8px; justify-items: center; }
+  .phone b { font-size: 14px; }
+  iframe { width: 360px; height: 720px; border: 10px solid #1d1c19; border-radius: 34px; background: #f6f4ef; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pass It On · demo</h1>
+  <span>Made-up students, one Thursday. <span class="clock" id="clock">{{ day(now) }}, {{ clock(now) }}</span></span>
+</header>
+<div class="controls">
+  <button class="main" data-a="next">Skip to the next handoff</button>
+  <button data-a="exam">Move Jay's exam +1 h</button>
+  <button data-a="late">Jay is running late</button>
+  <button data-a="moveout">Maya moves out</button>
+  <button data-a="reset">Start over</button>
+</div>
+<div class="phones">
+  {% for person, token in sessions.items() if person != 'dev' %}
+  <div class="phone"><b>{{ person|capitalize }}</b><iframe src="/?s={{ token }}" title="{{ person }}'s phone"></iframe></div>
+  {% endfor %}
+</div>
+<script>
+  document.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", async () => {
+    b.disabled = true;
+    const r = await (await fetch(`/demo/${b.dataset.a}`, { method: "POST" })).json();
+    document.getElementById("clock").textContent = r.clock;
+    document.querySelectorAll("iframe").forEach(f => f.contentWindow.location.reload());
+    b.disabled = false;
+  }));
+</script>
+</body>
+</html>

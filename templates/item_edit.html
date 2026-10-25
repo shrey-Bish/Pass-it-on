@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Is this right?</h1>
+<div class="photo"><img src="{{ link('/photos/' ~ item.photo) }}" alt="Your photo"></div>
+<form class="stack" method="post" action="{{ link('/items/' ~ item.id ~ '/edit') }}">
+  <label>What it is<input type="text" name="type" value="{{ item.type }}"></label>
+  <label>Its marks <span class="hint">used to check it's the same one at each handoff</span><textarea name="fingerprint">{{ item.fingerprint }}</textarea></label>
+  <p class="small">Condition: {{ item.condition }} · Value: {{ item.value_tier }}</p>
+  <h2>Your rules</h2>
+  <p class="small">It always stays with you during your own exams.</p>
+  <label>Home by<input type="time" name="return_by" value="{{ item.rules.return_by }}"></label>
+  <label>Where it starts and ends each day
+    <select name="home">{% for code, b in buildings.items() %}<option value="{{ code }}" {{ 'selected' if code == item.rules.home_building }}>{{ b.name }}</option>{% endfor %}</select></label>
+  <label>Who can borrow it
+    <select name="audience">
+      <option value="asu" {{ 'selected' if item.rules.audience == 'asu' }}>Anyone at ASU</option>
+      <option value="friends_of_friends" {{ 'selected' if item.rules.audience == 'friends_of_friends' }}>Friends of friends</option>
+      <option value="friends" {{ 'selected' if item.rules.audience == 'friends' }}>Friends only</option>
+    </select></label>
+  <label>Lowest reliability rating
+    <select name="min_rating">{% for b in ['new','ok','good','great'] %}<option value="{{ b }}" {{ 'selected' if b == item.rules.min_rating }}>{{ b }}</option>{% endfor %}</select></label>
+  <label class="check"><input type="checkbox" name="auto_approve" value="1" {{ 'checked' if item.rules.auto_approve }}> Say yes for me when the rating fits</label>
+  <h2>Its personality</h2>
+  <div class="choices">
+  {% for p, line in samples.items() %}
+    <label class="choice"><input type="radio" name="persona" value="{{ p }}" {{ 'checked' if p == item.persona }}><span>{{ p|capitalize }}</span><span class="say">“{{ line }}”</span></label>
+  {% endfor %}
+  </div>
+  <button class="btn primary wide">List it</button>
+</form>
+{% endblock %}

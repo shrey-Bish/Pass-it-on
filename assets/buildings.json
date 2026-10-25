@@ -1,0 +1,18 @@
+{
+  "note": "ASU Tempe public campus buildings. Coordinates are approximate, read off ASU's public campus map; good enough for walking minutes. Handoffs happen only at these buildings: no residence halls, no home addresses.",
+  "buildings": [
+    {"code": "MU",    "name": "Memorial Union",                          "lat": 33.41734, "lon": -111.93470, "aliases": ["memorial union"]},
+    {"code": "HAY",   "name": "Hayden Library",                          "lat": 33.41880, "lon": -111.93520, "aliases": ["hayden library", "hayden"]},
+    {"code": "LL",    "name": "Durham Language & Literature",            "lat": 33.41870, "lon": -111.93640, "aliases": ["durham hall", "durham language", "language and literature", "language & literature", "durham"]},
+    {"code": "COOR",  "name": "Coor Hall",                               "lat": 33.41960, "lon": -111.93780, "aliases": ["coor hall", "lattie f. coor", "coor"]},
+    {"code": "WXLR",  "name": "Wexler Hall",                             "lat": 33.42100, "lon": -111.93330, "aliases": ["wexler hall", "wexler"]},
+    {"code": "PSH",   "name": "Physical Sciences H",                     "lat": 33.42040, "lon": -111.93140, "aliases": ["physical sciences", "phys sci"]},
+    {"code": "LSA",   "name": "Life Sciences A",                         "lat": 33.42010, "lon": -111.93460, "aliases": ["life sciences"]},
+    {"code": "NOBLE", "name": "Noble Library",                           "lat": 33.41980, "lon": -111.93050, "aliases": ["noble library", "noble science"]},
+    {"code": "SCOB",  "name": "Schwada Classroom Office Building",       "lat": 33.41860, "lon": -111.93100, "aliases": ["schwada"]},
+    {"code": "MCRD",  "name": "McCord Hall",                             "lat": 33.41660, "lon": -111.93330, "aliases": ["mccord hall", "mccord"]},
+    {"code": "ECG",   "name": "Engineering Center G",                    "lat": 33.42150, "lon": -111.93960, "aliases": ["engineering center"]},
+    {"code": "BYENG", "name": "Brickyard Engineering",                   "lat": 33.42360, "lon": -111.93940, "aliases": ["brickyard"]},
+    {"code": "ISTB4", "name": "Interdisciplinary Science & Technology 4", "lat": 33.42320, "lon": -111.92820, "aliases": ["istb4", "istb 4"]}
+  ]
+}

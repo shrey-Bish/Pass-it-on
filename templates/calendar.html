@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your calendar</h1>
+<p class="lede">Your exams keep your stuff with you, and show when you'll need to borrow. Nobody else ever sees your calendar.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+{% if imported %}<p class="note">Imported. Found {{ imported }} exam{{ '' if imported == '1' else 's' }}.</p>{% endif %}
+<form class="card stack" method="post" action="{{ link('/calendar') }}" enctype="multipart/form-data">
+  <label>Canvas calendar link <span class="hint">Canvas → Calendar → Calendar Feed</span><input type="url" name="url" placeholder="https://canvas.asu.edu/feeds/calendars/…"></label>
+  <label>Or the .ics file<input type="file" name="file" accept=".ics,text/calendar"></label>
+  <button class="btn primary wide">Import</button>
+</form>
+<form class="row" method="post" action="{{ link('/calendar') }}">
+  <span class="small">Or try a sample:</span>
+  {% for s in ['maya','jay','priya'] %}<button class="btn" name="sample" value="{{ s }}">{{ s|capitalize }}</button>{% endfor %}
+</form>
+<section>
+  <h2>Exams (your stuff stays with you)</h2>
+  <div class="stack">{% for e in exams %}<div class="card"><p>{{ describe(e) }}</p></div>{% else %}<p class="empty">None yet.</p>{% endfor %}</div>
+</section>
+{% if classes %}<section><h2>Classes</h2><div class="stack">{% for e in classes %}<p class="small">{{ describe(e) }}</p>{% endfor %}</div></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>What's your first name?</h1>
+<p class="lede">Classmates only ever see your first name.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form class="stack" method="post" action="{{ link('/name') }}">
+  <input type="text" name="name" autocomplete="given-name" required>
+  <button class="btn primary wide">Save</button>
+</form>
+{% endblock %}

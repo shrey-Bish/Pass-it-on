@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+{% if done %}
+  <h1>{{ 'Handed over' if giving else 'It\'s with you' }}</h1>
+  {% if check == 'match' %}<p class="note">Photo matches. All good.</p>
+  {% elif check == 'mismatch' %}<p class="error">That photo doesn't match the listing. I've let the owner know.</p>{% endif %}
+  {% if not giving and not check %}
+  <form class="card stack" method="post" action="{{ link('/legs/' ~ leg.id ~ '/photo') }}" enctype="multipart/form-data">
+    <p class="title">Optional: snap a quick check-in photo</p>
+    <input type="file" name="photo" accept="image/*" capture="environment" required>
+    <button class="btn wide">Check it</button>
+  </form>
+  {% endif %}
+  <a class="btn primary wide" href="{{ link('/') }}">Done</a>
+{% elif giving %}
+  <h1>Hand {{ owner }} to {{ other.name }}</h1>
+  <p class="lede">{{ clock(leg.pickup_time) }} at {{ campus.name(leg.pickup_building) }}. Ask {{ other.name }} to scan this with their camera.</p>
+  {% if h %}
+  <img class="qr" src="{{ link('/legs/' ~ leg.id ~ '/qr.png') }}" alt="Handoff QR code">
+  <p class="small" style="text-align:center">No camera? Tell {{ other.name }} the code:</p>
+  <p class="code">{{ h.code }}</p>
+  {% endif %}
+{% else %}
+  <h1>Get {{ owner }} from {{ other.name }}</h1>
+  <p class="lede">{{ clock(leg.pickup_time) }} at {{ campus.name(leg.pickup_building) }}. Scan their QR code with your camera, or type the code they tell you.</p>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form class="card stack" method="post" action="{{ link('/legs/' ~ leg.id ~ '/code') }}">
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="4-digit code" required>
+    <button class="btn primary wide">I got it</button>
+  </form>
+{% endif %}
+{% endblock %}

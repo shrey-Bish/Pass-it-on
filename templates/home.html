@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+{% if approvals or parts or moveout_offers or offers %}
+<section>
+  <h2>Waiting on you</h2>
+  <div class="stack">
+  {% for a in approvals %}
+    <div class="card action">
+      <p class="title">{{ a.who.name }} wants your {{ a.item.type }}</p>
+      <p class="meta"><b>{{ day(a.req.window_start) }}, {{ clock(a.req.window_start) }}–{{ clock(a.req.window_end) }}</b> · {{ campus.name(a.req.building) }}</p>
+      <div class="row">
+        <form class="inline" method="post" action="{{ link('/requests/' ~ a.req.id ~ '/answer') }}"><input type="hidden" name="yes" value="1"><button class="btn primary">Yes</button></form>
+        <form class="inline" method="post" action="{{ link('/requests/' ~ a.req.id ~ '/answer') }}"><button class="btn">No</button></form>
+      </div>
+    </div>
+  {% endfor %}
+  {% for i in moveout_offers %}
+    <div class="card action">
+      <p class="title">Want to keep this {{ i.type }}?</p>
+      <p class="small">Its owner is moving out. If you say yes, it's yours.</p>
+      <div class="row">
+        <form class="inline" method="post" action="{{ link('/moveout/' ~ i.id ~ '/answer') }}"><input type="hidden" name="yes" value="1"><button class="btn primary">Yes, it's mine</button></form>
+        <form class="inline" method="post" action="{{ link('/moveout/' ~ i.id ~ '/answer') }}"><button class="btn">No thanks</button></form>
+      </div>
+    </div>
+  {% endfor %}
+  {% for p in parts %}
+    <div class="card {{ 'action' if not p.confirmed or p.soon }}">
+      <p class="title">{{ p.what }}</p>
+      <p class="meta"><b>{{ clock(p.leg.pickup_time) }}</b> · {{ campus.name(p.leg.pickup_building) }} · {{ day(p.leg.pickup_time) }}</p>
+      <div class="row">
+        {% if p.active %}<span class="pill ok">With {{ 'you' if p.receiving else p.other.name }}</span>
+        {% elif p.confirmed %}<span class="pill ok">Confirmed</span>
+        {% else %}<form class="inline" method="post" action="{{ link('/legs/' ~ p.leg.id ~ '/confirm') }}"><button class="btn primary">Confirm</button></form>{% endif %}
+        {% if not p.active %}<a class="btn" href="{{ link('/legs/' ~ p.leg.id) }}">{{ 'Hand it over' if not p.receiving else 'I got it' }}</a>{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+  {% for e in offers %}
+    <div class="card">
+      <p class="title">{{ e.course }} exam {{ day(e.start) }}</p>
+      <p class="small">You have an exam and no calculator listed. Want me to find one?</p>
+      <form method="post" action="{{ link('/borrow/exam/' ~ e.uid) }}"><button class="btn primary">Find one</button></form>
+    </div>
+  {% endfor %}
+  </div>
+</section>
+{% endif %}
+<section>
+  <h2>Your stuff</h2>
+  <div class="stack">
+  {% for i in items %}
+    <a class="card" href="{{ link('/items/' ~ i.id) }}" style="text-decoration:none">
+      <p class="title">{{ i.type }}</p>
+      <p class="meta">{% if not i.listed %}<span class="pill wait">Not listed yet</span>{% elif i.mode == 'give_away' %}<span class="pill wait">Finding a new home</span>{% else %}<span class="pill ok">Lending</span>{% endif %}</p>
+    </a>
+  {% else %}
+    <p class="empty">Nothing listed yet. <a href="{{ link('/list') }}">Lend something</a></p>
+  {% endfor %}
+  </div>
+</section>
+<section>
+  <h2>Borrowing</h2>
+  <div class="stack">
+  {% for r in requests %}
+    <div class="card">
+      <p class="title">{{ r.item_type }}</p>
+      <p class="meta"><b>{{ day(r.window_start) }}, {{ clock(r.window_start) }}</b> · {{ campus.name(r.building) }}</p>
+      <p class="meta"><span class="pill {{ 'ok' if r.status in ('planned','confirmed','active','done') else 'wait' }}">{{ status_words[r.status] }}</span></p>
+    </div>
+  {% else %}
+    <p class="empty">Need something? <a href="{{ link('/borrow') }}">Borrow it</a></p>
+  {% endfor %}
+  </div>
+</section>
+{% if not demo %}
+<form method="post" action="/forget" class="small"><button class="btn">Delete everything about me</button></form>
+{% endif %}
+{% endblock %}

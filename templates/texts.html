@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Texts</h1>
+<p class="lede">What your stuff, and the stuff you borrow, has said to you.</p>
+<div class="stack">
+{% for m in messages %}
+  <div class="bubble"><p>{{ m.text }}</p><time>{{ day(m.at) }}, {{ clock(m.at) }}</time></div>
+{% else %}<p class="empty">Nothing yet.</p>{% endfor %}
+</div>
+{% endblock %}

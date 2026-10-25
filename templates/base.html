@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Pass It On{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{ link('/') }}">Pass It On<span>.</span></a>
+  {% if me and me.name %}<span class="who">{{ me.name }}{% if demo %} · {{ clock(now) }}{% endif %}</span>{% endif %}
+</header>
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+{% if me and me.name %}
+{% set here = request.url.path %}
+<nav class="tabs" aria-label="Main">
+  <a href="{{ link('/') }}" class="{{ 'on' if here == '/' }}">Home</a>
+  <a href="{{ link('/list') }}" class="{{ 'on' if here.startswith('/list') or here.startswith('/items') }}">Lend</a>
+  <a href="{{ link('/borrow') }}" class="{{ 'on' if here.startswith('/borrow') }}">Borrow</a>
+  <a href="{{ link('/texts') }}" class="{{ 'on' if here.startswith('/texts') }}">Texts</a>
+  <a href="{{ link('/calendar') }}" class="{{ 'on' if here.startswith('/calendar') }}">Calendar</a>
+</nav>
+{% endif %}
+{% if demo %}
+<script>
+  // Demo phones refresh when anything they show changes (another phone confirmed, the clock moved...).
+  let seen = null;
+  setInterval(async () => {
+    if (document.activeElement && ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+    try {
+      const v = (await (await fetch("/demo/version")).json()).version;
+      if (seen && v !== seen) location.reload();
+      seen = v;
+    } catch (e) {}
+  }, 2000);
+</script>
+{% endif %}
+</body>
+</html>

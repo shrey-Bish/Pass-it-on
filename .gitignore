@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+*.sqlite3
+.DS_Store
+# Uploaded photos and raw recordings can show real people and places; never commit them
+data/
+media/

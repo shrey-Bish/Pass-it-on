@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Your stuff has an agent now.</h1>
+  <p class="lede">Lend your calculator, goggles or blazer to classmates. It plans its own route around everyone's exams, and texts whoever has it.</p>
+</section>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+{% if sent %}
+  <p class="note">Check your texts for a sign-in link.</p>
+  {% if dev_link %}<p class="small">No texting set up yet, so here's your link: <a href="{{ dev_link }}">sign in</a></p>{% endif %}
+{% endif %}
+{% if request.query_params.get('expired') %}<p class="error">That link expired. Ask for a new one.</p>{% endif %}
+{% if request.query_params.get('forgotten') %}<p class="note">Done. Everything about you is deleted.</p>{% endif %}
+<form class="card stack" method="post" action="/login">
+  <label>Your phone number<input type="tel" name="phone" placeholder="480 555 1234" autocomplete="tel" required></label>
+  <input type="hidden" name="next" value="{{ next or '' }}">
+  <button class="btn primary wide">Text me a sign-in link</button>
+</form>
+<a class="btn wide" href="/demo">Try the demo</a>
+{% endblock %}

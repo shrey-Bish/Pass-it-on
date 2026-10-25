@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ item.type }}</h1>
+{% if item.photo %}<div class="photo"><img src="{{ link('/photos/' ~ item.photo) }}" alt="{{ item.type }}"></div>{% endif %}
+<dl class="facts">
+  <dt>With</dt><dd>{{ holder }}</dd>
+  <dt>Marks</dt><dd>{{ item.fingerprint or 'none noted' }}</dd>
+  <dt>Home by</dt><dd>{{ item.rules.return_by }} at {{ campus.name(item.rules.home_building) }}</dd>
+  {% if mine %}<dt>This week</dt><dd>{{ served }} exam{{ '' if served == 1 else 's' }}</dd>{% endif %}
+</dl>
+{% if mine %}
+<section>
+  <h2>Its route</h2>
+  <div class="card timeline">
+  {% for l in legs %}
+    <div class="stop"><span class="time {{ 'done' if l.status == 'done' }}">{{ clock(l.pickup_time) }}</span>
+      <span class="{{ 'done' if l.status == 'done' }}">{{ names[l.giver_id] }} → {{ names[l.holder_id] }} · {{ campus.name(l.pickup_building) }}</span></div>
+  {% else %}<p class="empty">No one's borrowing it yet.</p>{% endfor %}
+  </div>
+</section>
+<div class="row">
+  <a class="btn" href="{{ link('/items/' ~ item.id ~ '/edit') }}">Edit</a>
+  <form class="inline" method="post" action="{{ link('/moveout') }}"><button class="btn">I'm moving out</button></form>
+</div>
+{% endif %}
+{% endblock %}

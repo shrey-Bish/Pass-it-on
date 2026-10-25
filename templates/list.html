@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Lend something</h1>
+<p class="lede">Take a photo. I'll work out what it is and note its marks, like a sticker or a scratch, so handoffs can be checked later.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form class="card stack" method="post" action="{{ link('/list') }}" enctype="multipart/form-data">
+  <input type="file" name="photo" accept="image/*" capture="environment" required>
+  <button class="btn primary wide">Look at my photo</button>
+  <p class="small">Calculators, goggles, blazers, cameras, tools. Never notes, keys, IDs or medicine.</p>
+</form>
+{% endblock %}

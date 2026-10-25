@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Borrow something</h1>
+<p class="lede">Say what you need, when and where. Only the time and building are shared, never why.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form class="card stack" method="post" action="{{ link('/borrow') }}">
+  <textarea name="text" placeholder="need a TI-84 for my stats exam Thu 2pm in Durham Hall" required>{{ text or '' }}</textarea>
+  <button class="btn primary wide">Find one</button>
+  <p class="small">Check your exam allows that calculator model.</p>
+</form>
+{% for e in offers %}
+<div class="card">
+  <p class="title">{{ e.course }} exam {{ day(e.start) }}, {{ clock(e.start) }}</p>
+  <p class="small">No calculator listed. Want me to find one?</p>
+  <form method="post" action="{{ link('/borrow/exam/' ~ e.uid) }}"><button class="btn primary">Find one</button></form>
+</div>
+{% endfor %}
+{% endblock %}
